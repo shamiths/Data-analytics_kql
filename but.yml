@@ -1,0 +1,10 @@
+Rule1
+let timerange=1d;
+let FAILURECOUNT=4;
+let SUCCESSCOUNT=1;
+let authenticatonwindow=20min;
+SigninLogs
+| where TimeGenerated >=ago(timerange)
+|extend FAILUREORSUCCESS=iif(ResultType in ("0","50124","50160"),"FAILURE","SUCCESS")
+|summarize FAILURE=countif(FAILUREORSUCCESS=="FAILURE"),SUCCESS=countif(FAILUREORSUCCESS=="SUCCESS")by ("authenticatonwindow""Identity" ), Category, Identity, AppDisplayName
+|where FAILURE>=FAILURECOUNT and SUCCESS>=SUCCESSCOUNT
